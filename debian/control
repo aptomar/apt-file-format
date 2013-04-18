@@ -1,0 +1,14 @@
+Source: aptofile
+Section: utils
+Priority: extra
+Maintainer: Jarle Bauck Hamar <jarle.hamar@aptomar.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: http://www.aptomar.com/
+#Vcs-Git: git://git.debian.org/collab-maint/aptofile.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/aptofile.git;a=summary
+
+Package: aptofile
+Architecture: all
+Depends: ${misc:Depends}
+Description: Python utility for creating and verifying Apomar Files (.apt)
