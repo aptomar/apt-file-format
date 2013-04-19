@@ -16,8 +16,12 @@ import zipfile
 import sys,os
 from datetime import datetime
 import time
-import re
+import tempfile
 
+# Only needed if uploading to geoserver is required:
+gscat=None
+try: import geoserver.catalog as gscat
+except ImportError: pass
 
 testVerbose = False
 def testCase(f):
@@ -45,6 +49,18 @@ def writingMethod(f):
         ret = f(self,*args,**args2)
         if ret!=None: return ret
         else: return self.validate()
+    return decorated
+
+def requireGSConfig(f):
+    """
+    Decorator for ensuring that gsconfig is installed before
+    running a method for uploading
+    """
+    def decorated(*args, **kwargs):
+        if not gscat:
+            raise ImportError(' '.join(["gsconfig not installed.",
+                               "run 'pip install gsconfig'"]))
+        return f(*args, **kwargs)
     return decorated
 
 class Aptofile:
@@ -75,7 +91,7 @@ class Aptofile:
     @staticmethod
     def validateFile(filename):
         """
-        Validate a aptomar file
+        Validate an aptomar file
 
         Returns a boolean. To get the errors:
 
@@ -95,8 +111,8 @@ class Aptofile:
 
     @staticmethod
     def getManifestFromFile(filename):
-        zf = zipfile.ZipFile(filename)
-        return json.loads(zf.read(Aptofile.MANIFEST_FILE))
+        with zipfile.ZipFile(filename) as zf:
+            return json.loads(zf.read(Aptofile.MANIFEST_FILE))
     
     @staticmethod
     def open(filename,mode='r'):
@@ -115,22 +131,27 @@ class Aptofile:
         """
         if mode == 'w':
             raise Exception("Use Aptofile.create() to create new file")
-        zf = zipfile.ZipFile(filename)
 
-        manifest = json.loads(zf.read(Aptofile.MANIFEST_FILE))
+        
+        zf = zipfile.ZipFile(filename)
+        try:
+            manifest = json.loads(zf.read(Aptofile.MANIFEST_FILE))
+        finally:
+            zf.close()
         
         if manifest.has_key('asset'):
-            return AssetFile(zf,manifest)
+            return Assetfile(zf,manifest)
         if manifest.has_key('image'):
-            return ImageFile(zf,manifest)
+            return Imagefile(zf,manifest)
         if manifest.has_key('video'):
-            return VideoFile(zf,manifest)
+            return Videofile(zf,manifest)
         if manifest.has_key('point'):
-            return PointFile(zf,manifest)
+            return Pointfile(zf,manifest)
         if manifest.has_key('route'):
-            return RouteFile(zf,manifest)
+            return Routefile(zf,manifest)
         if manifest.has_key('area'):
-            return AreaFile(zf,manifest)
+            return Areafile(zf,manifest)
+        zf.close()
         raise NotImplementedError("File type not implemented")
 
     @staticmethod
@@ -158,17 +179,30 @@ class Aptofile:
             manifest['generator']['program']=args.get('program','')
             manifest['generator']['creator']=args.get('creator','')
         manifest['manifest-version']=args.get('manifest-version',1)
-        d = datetime.utcfromtimestamp(int(time.time())).isoformat()+'Z'
+        try:
+            d = datetime.utcfromtimestamp(int(time.time())).isoformat()+'Z'
+        finally:
+            zf.close()
         manifest['date']=args.get('date',d)
         manifest[fileType] = {}
 
-        if fileType=='asset': return AssetFile(zf,manifest)
-        elif fileType=='image': return ImageFile(zf,manifest)
-        elif fileType=='video': return VideoFile(zf,manifest)
-        elif fileType=='point': return PointFile(zf,manifest)
-        elif fileType=='route': return RouteFile(zf,manifest)
-        elif fileType=='area': return AreaFile(zf,manifest)
+        if fileType=='asset': return Assetfile(zf,manifest)
+        elif fileType=='image': return Imagefile(zf,manifest)
+        elif fileType=='video': return Videofile(zf,manifest)
+        elif fileType=='point': return Pointfile(zf,manifest)
+        elif fileType=='route': return Routefile(zf,manifest)
+        elif fileType=='area': return Areafile(zf,manifest)
 
+        zf.close()
+        return None
+
+    # Methods for checking filetype, overriden by subclass
+    def isAssetfile(self): return False
+    def isImagefile(self): return False
+    def isVideofile(self): return False
+    def isPointfile(self): return False
+    def isRoutefile(self): return False
+    def isAreafile(self): return False
 
     def __init__(self,zipfile,manifest=None):
         """
@@ -200,15 +234,13 @@ class Aptofile:
     def __exit__(self,type,value,tb): self.close()
 
     def _checkFiles(self,files):
-        nlist = '\n'.join(self.namelist())
         for f in files:
 
             if not ':' in f:
                 if not f in self.namelist():
                     raise IOError("File not found: %s"%f)
-            elif f.startswith('file:/'):
+            elif f.startswith('file://'):
                 if not f in self.namelist():
-                    print nlist
                     raise IOError("File not found: %s"%f)
             elif f.startswith('http://'):
                 pass
@@ -249,7 +281,7 @@ class Aptofile:
         """
         Write a file to the archive
         
-        file is a string with a local file (e.g. file:/foo/bar/foobar.txt) or
+        file is a string with a local file (e.g. file://foo/bar/foobar.txt) or
         a network file (e.g. "http://www.foobar.com/foo.txt"). It may
         also be a tuple where the second element is a string with the
         archive name of the file. If a local file is added without this,
@@ -263,8 +295,8 @@ class Aptofile:
                 return False
         elif not ':' in file:
             self.zipfile.write(file)
-        elif file.startswith('file:/'):
-            self.zipfile.write(file.split(':/')[1])
+        elif file.startswith('file://'):
+            self.zipfile.write(file.split('//')[1])
         elif file.startswith('data:'):
             pass
         elif file.startswith('http:'):
@@ -312,8 +344,8 @@ class Aptofile:
 
         return ret
 
-class AssetFile(Aptofile):
-
+class Assetfile(Aptofile):
+    
     LAYER_FIELDS = ['geometry','style','resources']
 
     def __init__(self, zipfile, manifest=None):
@@ -324,7 +356,8 @@ class AssetFile(Aptofile):
             asset['layers']=asset.get('layers',{})
             asset['groups']=asset.get('groups',{})
 
-
+    def isAssetfile(self): return True
+            
     @writingMethod
     def addLayer(self,key , **args):
         """
@@ -341,7 +374,7 @@ class AssetFile(Aptofile):
         resources      List of files*  Not set
 
         *List of files is a list where each element is
-        string with a local file (e.g. file:/foo/bar/foobar.txt) or
+        string with a local file (e.g. file://foo/bar/foobar.txt) or
         a network file (e.g. "http://www.foobar.com/foo.txt"). It may
         also be a tuple where the second element is a string with the
         archive name of the file. If a local file is added without this,
@@ -354,13 +387,13 @@ class AssetFile(Aptofile):
         layer['geometry']['type'] = args.get('geometry_type','text/x-shapefile')
         layer['style']={}
         layer['style']['type'] = args.get('style_type','text/x-sld')
-        if args.has_key('resources'):
+        if 'resources' in args:
             layer['resources']=args['resources']
         self.manifest['asset']['layers']=self.manifest['asset'].get('layers',{})
         self.manifest['asset']['layers'][key]=layer
 
         # Add the files
-        for field in AssetFile.LAYER_FIELDS:
+        for field in Assetfile.LAYER_FIELDS:
             if args.has_key(field+"_data"):
                 for f in args[field+"_data"]:
                     self.addFile2Layer(f,key,field)
@@ -405,14 +438,14 @@ class AssetFile(Aptofile):
 
         Returns: bool for valid status
 
-        file is a string with a local file (e.g. file:/foo/bar/foobar.txt) or
+        file is a string with a local file (e.g. file://foo/bar/foobar.txt) or
         a network file (e.g. "http://www.foobar.com/foo.txt"). It may
         also be a tuple where the second element is a string with the
         archive name of the file. If a local file is added without this,
         the archive name will be the same as filename, but without a drive
         letter and with leading path separators removed.
         """
-        if fileType not in AssetFile.LAYER_FIELDS:
+        if fileType not in Assetfile.LAYER_FIELDS:
             raise Exception("Invalid file type: %s"%fileType)
 
         if writeFile: self.writefile(file)
@@ -454,7 +487,114 @@ class AssetFile(Aptofile):
         self.valid=ret
         return ret
 
-class ImageFile(Aptofile):
+    @requireGSConfig
+    def uploadToStore(self, url, workspace=None, username='admin',
+                      passwrd='geoserver'):
+        """
+        Upload layers and groups to GeoServer
+
+        Layers are uploaded as shapefiles which creates a separate store
+        for each layer. The layer name will be used as the name of the
+        store.
+
+        If workspace is not specified, the default on the server will be used.
+        """
+        asset_dict=self.manifest['asset']
+        for key, layer_dict in asset_dict['layers'].iteritems():
+            self.uploadLayerToShapefile(url, key, workspace=workspace,
+                                        username=username,passwrd=passwrd)
+
+        for key, group_dict in asset_dict['groups'].iteritems():
+            self.uploadGroup(url, key, workspace=workspace,
+                             username=username, passwrd=passwrd)
+
+    @requireGSConfig
+    def uploadLayerToShapefile(self, url, layer_key, store_name='',
+                               workspace=None, username='admin',
+                               passwrd='geoserver'):
+        """
+        Upload a layer to GeoServer as shapefile.
+
+        The layer_key specifies the layer. Each shapefile becomes a
+        separate store on the server and if a store_name is not
+        supplied the name of the layer will be used.
+
+        If not a style with the same name already exists on the server,
+        the style file(s) will be uploaded. The filename is used as
+        name of the style.
+
+        If workspace is not specified, the default on the server will be used.
+        """
+        layer_dict = self.manifest['asset']['layers'].get(layer_key,None)
+        if not layer_dict:
+            raise Exception("Layer with key '%s' not in file"%layer_key)
+        
+        layer_name = layer_dict['name']
+        if not store_name:
+            store_name = layer_name
+
+        cat = gscat.Catalog(url)
+        tmphandle,tmpfile = tempfile.mkstemp()
+        with zipfile.ZipFile(tmpfile,'w') as tmpzip:
+            for fn in layer_dict['geometry']['data']:
+                tmpzip.writestr(os.path.basename(fn),
+                                self.readfile(fn))
+        try:
+            ds = cat.create_datastore(store_name)
+            cat.add_data_to_store(ds,layer_name,tmpfile,workspace)
+        finally:
+            if os.path.exists(tmpfile):
+                os.remove(tmpfile)
+
+        # Upload Style
+        for fn in layer_dict['style']['data']:
+            style_name = os.path.splitext(os.path.basename(fn))[0].lower()
+            if not cat.get_style(style_name):
+                with open(fn) as fid:
+                    cat.create_style(style_name,fid)
+
+    @requireGSConfig
+    def uploadGroup(self, url, group_key, workspace=None,
+                           username='admin',passwrd='geoserver'):
+        """
+        Upload a group to Geoserver.
+
+        NB! The layers (and styles) should exist on the server.
+
+        The group_key specifies the group. If more than one style file exist
+        for a layer, only the first in the list will be used.
+        
+        If workspace is not specified, the default on the server will be used.
+        """
+        group_dict = self.manifest['asset']['groups'].get(group_key,None)
+        if not group_dict:
+            raise Exception("Group with key '%s' not in file"%(group_key))
+
+        group_name=group_dict['name']
+        layer_keys = group_dict['layers']
+        layers=[]
+        styles=[]
+        for ln in layer_keys:
+            layer_dict = self.manifest['asset']['layers'][ln]
+            layers.append(layer_dict['name'])
+            styles.append(os.path.basename(
+                    layer_dict['style']['data'][0]).lower())
+        cat = gscat.Catalog(url)
+        grp = cat.get_layergroup(group_name)
+        if grp:
+            if not grp.layers:
+                grp.layers = []
+                grp.styles = []
+            for i in range(len(layers)):
+                grp.layers.append(layers[i])
+                grp.styles.append(styles[i])
+        else:
+            grp = cat.create_layergroup(group_name,layers,styles)
+            del grp.dirty['bounds']
+
+        cat.save(grp)
+
+class Imagefile(Aptofile):
 
     def __init__(self, zipfile, manifest=None):
         Aptofile.__init__(self, zipfile, manifest)
@@ -464,6 +604,8 @@ class ImageFile(Aptofile):
             imageDict['created']=imageDict.get('created',self.manifest['date'])
             imageDict['description']=imageDict.get('description','')
             imageDict['name']=imageDict.get('name','')
+            
+    def isImagefile(self): return True
 
     @writingMethod
     def setImageName(self,name):
@@ -518,7 +660,7 @@ class ImageFile(Aptofile):
         self.valid=ret
         return ret
 
-class VideoFile(Aptofile):
+class Videofile(Aptofile):
 
     def __init__(self, zipfile, manifest=None):
         Aptofile.__init__(self, zipfile, manifest)
@@ -529,6 +671,8 @@ class VideoFile(Aptofile):
             videoDict['description']=videoDict.get('description','')
             videoDict['name']=videoDict.get('name','')
 
+    def isVideofile(self): True
+    
     @writingMethod
     def setVideoName(self, name):
         self.manifest['video']['name'] = name
@@ -573,7 +717,7 @@ class VideoFile(Aptofile):
         self.valid=ret
         return ret
 
-class PointFile(Aptofile):
+class Pointfile(Aptofile):
     
     OBJECT_TYPES = ['boat','bouy','debris','fishfarm','green','oil',
                     'personel','red','unknown','vessel','yellow']
@@ -586,9 +730,11 @@ class PointFile(Aptofile):
             pointDict['created'] = pointDict.get('created',self.manifest['date'])
             pointDict['description'] = pointDict.get('description','')
             pointDict['name'] = pointDict.get('name','')
-            pointDict['object-type'] = pointDict.get('object-type','')
+            pointDict['object-type'] = pointDict.get('object-type','unknown')
             pointDict['geometry'] = pointDict.get('geometry',{})
 
+    def isPointfile(self): True
+    
     @writingMethod
     def setPointName(self,name): self.manifest['point']['name']
 
@@ -603,7 +749,7 @@ class PointFile(Aptofile):
     @writingMethod
     def setPointType(self, type):
         type = type.lower()
-        if not type in PointFile.OBJECT_TYPES:
+        if not type in Pointfile.OBJECT_TYPES:
             raise Exception("Invalid type %s"%type)
         self.manifest['point']['object-type'] = type
 
@@ -629,14 +775,14 @@ class PointFile(Aptofile):
         @testCase
         def pointType(self):
             pt = self.manifest['point']['object-type']
-            if not pt.lower() in PointFile.OBJECT_TYPES:
+            if not pt.lower() in Pointfile.OBJECT_TYPES:
                 raise Exception("Invalid object type: '%s'"%pt)
         ret = pointType(self) and ret
 
         self.valid=ret
         return ret
         
-class RouteFile(Aptofile):
+class Routefile(Aptofile):
 
     def __init__(self, zipfile, manifest=None):
         Aptofile.__init__(self, zipfile, manifest)
@@ -648,6 +794,8 @@ class RouteFile(Aptofile):
             routeDict['created'] = routeDict.get('created',self.manifest['date'])
             routeDict['geometry'] = routeDict.get('geometry',{})
 
+    def isRoutefile(self): True
+    
     @writingMethod
     def setRouteName(self, name):
         self.manifest['route']['name'] = name
@@ -683,7 +831,7 @@ class RouteFile(Aptofile):
         self.valid=ret
         return ret
 
-class AreaFile(Aptofile):
+class Areafile(Aptofile):
 
     def __init__(self, zipfile, manifest=None):
         Aptofile.__init__(self, zipfile, manifest)
@@ -695,6 +843,8 @@ class AreaFile(Aptofile):
             areaDict['created'] = areaDict.get('created',self.manifest['date'])
             areaDict['geometry'] = areaDict.get('geometry',{})
 
+    def isAreafile(self): True
+    
     @writingMethod
     def setAreaName(self, name):
         self.manifest['area']['name'] = name
@@ -730,43 +880,5 @@ class AreaFile(Aptofile):
         self.valid=ret
         return ret
 
-if __name__=='__main__':
-    """
-    Simple example of a validator
-    """    
-    import argparse
 
-    desc ="Validate Aptomar files. Exit status is 0 on success."
-
-
-
-    
-    parser=argparse.ArgumentParser(description = desc)
-    parser.add_argument('-s','--schema', type=file,
-                        help="JSON Schema file")
-    parser.add_argument('aptofile', nargs='+',
-                        help="File(s) to validate")
-
-    args = parser.parse_args()
-
-    if args.schema:
-        AptoFile.SCHEMA = json.loads(args.schema.read())
-        args.schema.close()
-
-    ret = True
-    for f in args.aptofile:
-        print "Validating %s: "%f,
-        
-        if Aptofile.validateFile(f):
-            print "ok"
-        else:
-            print "Failed: "
-            with Aptofile.open(f) as af:
-                af.validate()
-                for err in af.getFailedTests():
-                    print err
-            ret = False
-
-    if not ret:
-        exit(1)
         
