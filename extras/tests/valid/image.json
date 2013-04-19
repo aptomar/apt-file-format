@@ -1,0 +1,24 @@
+{
+    "date": "2012-12-19T08:46Z",
+    "description": "Text description of the contents for presentation in a confirmation dialog.",
+    "generator": { 
+        "program": "SuperCool.app",
+        "creator": "Aptomar AS"
+    },
+    "manifest_version": 1,
+    "image": { 
+        "name": "The image name",
+        "description": "A detailed description of the image",
+        "created": "2012–12–19T08:46Z",
+        "data": ["file:image.jpg"],
+        "georeference": {
+            "longitude": 10.4344,
+            "latitude": 63.4181,
+            "elevation": 150.60
+        },
+        "bounds": {
+            "type": "text/x-worldfile",
+            "data": ["data:,bounds as a string, interpreted by type"]
+        }
+    }
+}

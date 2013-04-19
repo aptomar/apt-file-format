@@ -1,7 +1,7 @@
     {
       "type":"object",
       "$schema": "http://json-schema.org/draft-04/schema",
-      "id": "https://aptomar.com/pub/dev/apt.schema.json",
+      "id": "https://raw.github.com/aptomar/apt-file-format/master/src/apt.schema.json",
       "minProperties": 4,
       "maxProperties": 5,
       "definitions": {

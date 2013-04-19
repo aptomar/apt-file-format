@@ -1,0 +1,19 @@
+{
+    "date": "2012-12-19T08:46Z",
+    "description": "Text description of the contents for presentation in a confirmation dialog.",
+    "generator": { 
+        "program": "SuperCool.app",
+        "creator": "Aptomar AS"
+    },
+    "manifest_version": 1,
+    "point": {
+        "name": "The point name",
+        "description": "A detailed description of the point",
+        "created": "2012–12–19T08:46Z",
+        "object-type": "boat",
+        "geometry": {
+            "type": "text/x-ewkt",
+            "data": ["file:...", "data:...", "http://"]
+        }
+    }
+}

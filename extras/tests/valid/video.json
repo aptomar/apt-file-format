@@ -1,0 +1,20 @@
+{
+    "date": "2012-12-19T08:46Z",
+    "description": "Text description of the contents for presentation in a confirmation dialog.",
+    "generator": { 
+        "program": "SuperCool.app",
+        "creator": "Aptomar AS"
+    },
+    "manifest_version": 1,
+    "video": {
+        "name": "The video name",
+        "description": "A detailed description of the video",
+        "created": "2012–12–19T08:46Z",
+        "georeference": {
+            "longitude": 10.4344,
+            "latitude": 63.4181,
+            "elevation": 150.60
+        },
+        "data": ["file:...", "data:...", "http://"]
+    }
+}

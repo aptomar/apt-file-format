@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title></title>
+
+  <style type="text/css">
+@page {
+    font-family: "Trade Gothic LT Std";
+    @top { content: flow(header); }
+    @bottom { font-size: 9pt; content: "Revision: " string(docrev); }
+    @bottom-left {
+        font-size: 9pt;
+        content: "Document: " string(docno); 
+        width: 70mm;
+        /*border-right: solid 1px;*/
+    }
+    @bottom-right {
+        font-size: 9pt;
+        width: 30mm;
+        content: "Page " counter(page) " of " counter(pages) 
+    }
+    size: A4;
+    border-bottom: solid 1pt black;
+    margin: 40mm 20mm 20mm 20mm;
+}
+#docno { string-set: docno content(); }
+#docrev { string-set: docrev content(); }
+
+body {
+    font-family: "Trade Gothic LT Std";
+    font-size: 9pt;
+    width: 170mm;
+    margin: 10mm auto;
+    line-height: 150%;
+}
+.fontEctoplasmRegular {
+    font-family: "Ectoplasm-Regular", "EctoplasmRegular";
+}
+
+p { text-align: justify; }
+li > p { margin: 0; }
+a { color: #00a; text-decoration: none; }
+h1 { font-size: 16pt; }
+h2 { font-size: 14pt; }
+h3 { font-size: 12pt; }
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a, nav a { color: black; }
+
+nav a::after {
+    content: leader(".") target-counter(attr(href), page);
+}
+nav ul {
+    list-style-type: none; 
+    margin-left: 0pt;
+    padding-left: 10mm;
+}
+nav > ul {
+    margin-left: 0pt;
+    padding-left: 0pt;
+}
+ol, ul {
+    padding-left: 3mm;
+    margin-left: 3mm;
+}
+table {
+    border-collapse: collapse;
+    width: 90%;
+    margin: 0pt auto;
+}
+img {
+    max-width: 90%;
+}
+code,pre {
+    display: block;
+    background: #eee;
+    border: 1pt solid black;
+    padding: 3mm; margin: 3mm 0pt;
+}
+pre > code { border: none; padding: 0; margin: 0; }
+
+#docHeader {
+    flow: static(header);
+}
+#docHeader td {
+    border: none;
+    padding: 0pt;
+}
+#footerTable {
+    flow: static(footer);
+    width: 170mm;
+}
+#footerTable td {
+    width: 56.7mm;
+    text-align: center;
+    border-top: 1px solid;
+    border-left: 0px;
+    border-right: 0px;
+    border-bottom: 0px;
+}
+#footerTable td:first-child{
+    text-align: left;
+}
+#logoTable {
+    width: 100%;
+    border: none;
+}
+#headerTable {
+    width: 100mm;
+    margin-right: 0pt;
+}
+
+.addressRow {
+    font-size: 6pt;
+    padding-right: 0px;
+    padding-left: 2mm;
+}
+.orange {
+    color: #b80;
+    width: 3mm;
+    font-weight: bold;
+}
+#confidentiality {
+    font-size: 20pt;
+    color: red;
+    text-align: center;
+}
+#headerLogo {
+    width: 70mm;
+}
+
+#titleTable {
+    width: 170mm;
+    border: 1pt solid;
+    border-spacing: 0pt;
+    margin-bottom: 7mm;
+}
+#pagesLabel{
+    content: "Page Count:";
+}
+#pagesCntLabel{
+    content: counter(pages);
+}
+
+td {
+    padding: 4pt;
+    border: 1pt solid black;
+    border-spacing: 0pt;
+}
+.titleRow {
+    font-size: 14pt;
+    text-align: center;
+}
+.titleRowSmall {
+    font-size: 9pt;
+}
+#revisionTable {
+    width: 170mm;
+    border: 1pt solid;
+    border-top: 0pt;
+    border-spacing: 0pt;
+    font-size: 9pt;
+    text-align: center;
+    margin-bottom: 10mm;
+}
+#revisionTable th {
+    height: 7mm;
+    background-color: #bbb;
+    border: 1pt solid black;
+}
+#revisionTable td {
+    height: 7mm;
+    padding: 0pt;
+}
+.revisionDescription {
+    text-align: left;   
+    /*width: 120mm;*/
+}
+
+.pagebreak {
+    page-break-after:always;
+}
+  </style>
+</head>
+<body>
+
+<div id="docHeader">
+ <table id="headerTable">
+  <tr class="addressRow">
+   <td class="fontEctoplasmRegular">aptomar AS</td>
+   <td class="orange">A</td><td>Stiklestadveien 3</td>
+   <td>7041 Trondheim</td>
+   <td class="orange">T</td><td>+47 40 00 34 03</td>
+   <td class="orange">O</td><td>NO 988 567 256</td>
+  </tr>
+  <tr class="addressRow">
+   <td></td><td></td><td></td>
+   <td>Norway</td>
+   <td class="orange">F</td><td>+47 73 51 00 84</td>
+   <td class="orange">W</td><td>www.aptomar.com</td>
+  </tr>
+ </table>
+ <table id="logoTable"><tr><td>
+  <img id="headerLogo" src="data:image/png;base64,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" />
+  </td><td id="confidentiality">DRAFT&nbsp;for&nbsp;Comment</td></tr></table>
+</div>
+
+<table id="titleTable">
+  <tr>
+    <td><div class="titleRowSmall">Document Title:</div><br>
+    <div class="titleRow">aptomar&nbsp;file&nbsp;format&nbsp;description</div></td>
+    <td><div class="titleRowSmall">Doc Rev:</div><br>
+    <div id="docrev" class="titleRow">1</div></td>
+    <td><div class="titleRowSmall">Document No:</div><br>
+    <div id="docno" class="titleRow">:</div></td>
+    <td><div class="titleRowSmall">Doc. Responsible:</div><br>
+    <div class="titleRow">MTL</div></td>
+  </tr>
+</table>
+<div class="pagebreak"></div>
+
+<h1>Contents</h1>
+<nav id="TOC">
+<ul>
+<li><a href="#aptomar-asset-bundle-format"><span class="toc-section-number">1</span> Aptomar asset bundle format</a><ul>
+<li><a href="#goals"><span class="toc-section-number">1.1</span> Goals</a></li>
+<li><a href="#format"><span class="toc-section-number">1.2</span> Format</a><ul>
+<li><a href="#archive-organization"><span class="toc-section-number">1.2.1</span> Archive organization</a></li>
+<li><a href="#manifest.json"><span class="toc-section-number">1.2.2</span> <em>manifest.json</em></a></li>
+</ul></li>
+<li><a href="#manifest.json-entries"><span class="toc-section-number">1.3</span> <em>manifest.json</em> entries</a><ul>
+<li><a href="#including-files"><span class="toc-section-number">1.3.1</span> Including Files</a></li>
+<li><a href="#field-summary"><span class="toc-section-number">1.3.2</span> Field summary</a></li>
+<li><a href="#field-details"><span class="toc-section-number">1.3.3</span> Field details</a></li>
+</ul></li>
+<li><a href="#examples"><span class="toc-section-number">1.4</span> Examples</a><ul>
+<li><a href="#map-data-layers"><span class="toc-section-number">1.4.1</span> Map Data Layers</a></li>
+<li><a href="#image-1"><span class="toc-section-number">1.4.2</span> Image</a></li>
+<li><a href="#video-1"><span class="toc-section-number">1.4.3</span> Video</a></li>
+</ul></li>
+<li><a href="#useful-information"><span class="toc-section-number">1.5</span> Useful Information</a></li>
+<li><a href="#open-questions"><span class="toc-section-number">1.6</span> Open Questions</a></li>
+</ul></li>
+<li><a href="#appendix-manifest.json-schema"><span class="toc-section-number">2</span> Appendix: <em>manifest.json</em> Schema</a></li>
+</ul>
+</nav>
+<section id="aptomar-asset-bundle-format" class="level1">
+<h1><a href="#aptomar-asset-bundle-format"><span class="header-section-number">1</span> Aptomar asset bundle format</a></h1>
+<p>This document describes the <strong>draft</strong> description of the data file that describes customer assets for import into the aptomar system.</p>
+<p>This is a <strong>draft</strong> and is open for discussion.</p>
+<section id="goals" class="level2">
+<h2><a href="#goals"><span class="header-section-number">1.1</span> Goals</a></h2>
+<p>The goal of this file format is to describe a method for generic import and export of data from an Aptomar system. This document describes a general format and provides a mechanism for extending the format for new data types. This document also describes several examples of common uses for this format.</p>
+</section>
+<section id="format" class="level2">
+<h2><a href="#format"><span class="header-section-number">1.2</span> Format</a></h2>
+<p>The file is a zip-formatted archive containing the following:</p>
+<ul>
+<li>All files related to the asset</li>
+<li>A <em>manifest.json</em> file describing the files and organization in the archive</li>
+<li>The archive should have the extension <em>.apt</em>.</li>
+</ul>
+<section id="archive-organization" class="level3">
+<h3><a href="#archive-organization"><span class="header-section-number">1.2.1</span> Archive organization</a></h3>
+<p>A hypothetical archive could look as follows:</p>
+<pre><code>&lt;archive&gt;.apt
+|-- &lt;folder&gt;
+|   |-- file1.xxx
+|   |-- file2.yyy
+|   `-- file3.zzz
+|-- manifest.json
+`-- resources
+     |-- img.png
+     `-- img.jpg</code></pre>
+<p>The archive <em>may</em> be but is not <em>required</em> to be compressed. Depending on the data included in the archive, compression may be either superfluous or counter-productive. In general, it is recommended to begin with an uncompressed archive.</p>
+</section>
+<section id="manifest.json" class="level3">
+<h3><a href="#manifest.json"><span class="header-section-number">1.2.2</span> <em>manifest.json</em></a></h3>
+<p>The <em>manifest.json</em> file describes the layout and structure of the archive. It has the following format:</p>
+<pre><code>{
+    &quot;key-1&quot;: &quot;value-1&quot;,
+    &quot;key-2&quot;: &quot;value-2&quot;,
+     …,
+     &quot;key-n&quot;: &quot;value-n&quot;
+}</code></pre>
+<p>That is, the manifest is a valid JSON-formatted file that contains <em>key-value</em> tuples that describe the data in the archive.</p>
+</section>
+</section>
+<section id="manifest.json-entries" class="level2">
+<h2><a href="#manifest.json-entries"><span class="header-section-number">1.3</span> <em>manifest.json</em> entries</a></h2>
+<p>This section describes the keys and values that are expected and required inside the manifest file. The keys break down into common keys that can be in any manifest and data-type-specific keys that apply to files with only certain types of data.</p>
+<p>This section is intended to be descriptive <strong>only</strong>. <em>manifest.json</em> files <strong>must</strong> validate against the current schema to be considered correct.</p>
+<section id="including-files" class="level3">
+<h3><a href="#including-files"><span class="header-section-number">1.3.1</span> Including Files</a></h3>
+<p>The main purpose of a <em>manifest.json</em> file is to describe the data included in and needed by an archive file. Most data references in the manifest are of the following form:</p>
+<pre><code>&quot;some-key&quot;: {
+    &quot;data&quot;: [&quot;file:/foo.txt&quot;, &quot;data:text/x-sld,&lt;data&gt;&quot;,    ↩
+             &quot;http://foo.bar.com/foo.jpg&quot;],
+    &quot;type&quot;: &quot;text/x-ewkt&quot;
+}</code></pre>
+<p>The two required keys are “data” and “type”. The “type” is a pseudo-mime type that describes the data. The types that are accepted depend on the context and are described below. These are typically something like the following: “text/x-sld”, “text/x-worldfile”, “image/jpeg” or the like.</p>
+<p>The “data” field is an array of files that encompass the data. It is expected in most cases that this will be an array with one element, but some particular types of data may have multiple parts. For example, an ESRI shapefile includes at least three components.</p>
+<p>A “data” element may specify data in one of three ways:</p>
+<ol type="1">
+<li><em>“data”: [“file:/foo.txt”]</em> indicates that the data may be found in a file “foo.txt” included in the root of the archive.</li>
+<li><em>“data”: [“data:,Data as a string”]</em> indicates that data is included as an encoded URI. This follows the normal rules of data URIs (e.g. RFC 2397) and can include content such as images directly in the manifest.</li>
+<li><em>“data”: [“http://foo.com/foo.txt”]</em> indicates that the file can be retrieved at the specified URI. This is somewhat dangerous as there is no guarantee as to <em>when</em> the client will retrieve the data.</li>
+</ol>
+</section>
+<section id="field-summary" class="level3">
+<h3><a href="#field-summary"><span class="header-section-number">1.3.2</span> Field summary</a></h3>
+<pre><code>{
+    // Required
+    &quot;date&quot;: &quot;2012–12–19T08:46Z&quot;,
+    &quot;description&quot;: &quot;Useful description of the contents&quot;,
+    &quot;generator&quot;: {...},
+    &quot;manifest_version&quot;: 1,   // Currently version 1
+    
+    // One of the following
+    
+    // Map data layer fields
+    &quot;groups&quot;: {...},
+    &quot;layers&quot;: {...},
+    
+    // Image fields
+    &quot;image&quot;: {...},
+    
+    // Video fields
+    &quot;video&quot;: {...},
+    
+    // User-created data fields (pick one)
+    &quot;point&quot;: {...},
+    &quot;route&quot;: {...},
+    &quot;area&quot;: {...}
+}</code></pre>
+</section>
+<section id="field-details" class="level3">
+<h3><a href="#field-details"><span class="header-section-number">1.3.3</span> Field details</a></h3>
+<section id="date" class="level4">
+<h4><a href="#date"><span class="header-section-number">1.3.3.1</span> date</a></h4>
+<p>This key describes the date and time the archive was generated in ISO 8601 format.</p>
+<p><em>Example:</em> “2012-12-19T08:46Z” means the archive was created at 8:46 UTC on December 19, 2012.</p>
+</section>
+<section id="description" class="level4">
+<h4><a href="#description"><span class="header-section-number">1.3.3.2</span> description</a></h4>
+<p>The description is a key that contains an informational string that can be displayed to the user. It should contain some relevant information about the file.</p>
+<p><em>Example:</em> “Winter 2012 extraction of asset data”</p>
+</section>
+<section id="generator" class="level4">
+<h4><a href="#generator"><span class="header-section-number">1.3.3.3</span> generator</a></h4>
+<p>The generator is a dictionary that contains additional information that can be displayed to the user.</p>
+<pre><code>{
+    &quot;program&quot;: &quot;Name / ID of the generator program&quot;,
+    &quot;creator&quot;: &quot;Contact string for the creator of the file&quot;
+}</code></pre>
+</section>
+<section id="manifest_version" class="level4">
+<h4><a href="#manifest_version"><span class="header-section-number">1.3.3.4</span> manifest_version</a></h4>
+<p>This describes the version of the manifest file that is needed to parse the file. Required for future compatibility.</p>
+</section>
+<section id="layers" class="level4">
+<h4><a href="#layers"><span class="header-section-number">1.3.3.5</span> layers</a></h4>
+<p>Layers are an dictionary of dictionaries where each entry describes one layer in the archive. Each dictionary entry should contain the following:</p>
+<pre><code>&quot;layer-key-1&quot;: {
+    &quot;name&quot;: &quot;Layer 1 Name&quot;,
+    &quot;geometry&quot;: {...},
+    &quot;style&quot;: {...},
+    &quot;resources&quot;: {...}
+}</code></pre>
+<p>The “key” (“layer-1” in the example) is an internal reference used to refer to the layer. It must be unique. “name” is a human-readable description of the layer.</p>
+<p>“geometry”, “style” and “resources” are all data references. The only currently supported formats are the following:</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">key</th>
+<th style="text-align: left;">format</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">geometry</td>
+<td style="text-align: left;">“text/x-shapefile”</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">style</td>
+<td style="text-align: left;">“text/x-sld”</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">resources</td>
+<td style="text-align: left;">varies depending on the resource.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: left;">Most “image/*” formats supported.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="groups" class="level4">
+<h4><a href="#groups"><span class="header-section-number">1.3.3.6</span> groups</a></h4>
+<p>Groups describe the relative organization of layers into groups of easier display. For clarity, groups should be limited to a relatively small number (&lt;10) and layers <strong>must</strong> described in at least one group or they will not be displayed.</p>
+<pre><code>&quot;group-1&quot;: {
+    &quot;name&quot;: &quot;Group 1 Name&quot;,
+    &quot;layers&quot;: [&quot;layer-key-1&quot;, &quot;layer-key-2&quot;]
+}</code></pre>
+<p>The “key” (“group-1” in the example) is an internal reference used to refer to the group. It must be unique. “name” is a human-readable description of the group.</p>
+<p>“layers” is an array of references to layers. Each element of the array is a key in the root layers dictionary.</p>
+</section>
+<section id="image" class="level4">
+<h4><a href="#image"><span class="header-section-number">1.3.3.7</span> image</a></h4>
+<p>The image field describes a single image contained in an archive.</p>
+<pre><code>{
+    &quot;name&quot;: &quot;The image name&quot;,
+    &quot;description&quot;: &quot;A detailed description of the image&quot;,
+    &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+
+    &quot;data&quot;: {...},
+    // The following are optional
+    &quot;georeference&quot;: {...},
+    &quot;bounds&quot;: {...}
+}</code></pre>
+<p>“name” is a short title for the image. More information can be provided in the “description” field. “data” is a file reference to the image file data.</p>
+<p>The “georeference” is the location of the sensor when the image was captured. The georeference is a dictionary with the following keys:</p>
+<pre><code> {
+    // WGS-84
+    &quot;longitude&quot;: 0.000,
+    &quot;latitude&quot;: 0.000,
+    &quot;elevation&quot;: 0.000  // in meters
+}</code></pre>
+<p>The “bounds” represent how to map the image data into the map. The method for processing the bounds depends on the “bound-type”. The format for a “bounds” object is the following:</p>
+<pre><code>{
+    &quot;data&quot;: [&quot;...&quot;],
+    &quot;type&quot;: &quot;text/x-worldfile&quot;
+}</code></pre>
+<p>The “type” specifies the format for the bounds option. Presently the only acceptable format is “text/x-worldfile”, corresponding to the <a href="http://en.wikipedia.org/wiki/World_file" title="The ESRI World file">ESRI World file format</a>. “data” is described in the section about file references above</p>
+</section>
+<section id="video" class="level4">
+<h4><a href="#video"><span class="header-section-number">1.3.3.8</span> video</a></h4>
+<p>The video field describes a single video contained in an archive.</p>
+<pre><code>{
+    &quot;name&quot;: &quot;The video name&quot;,
+    &quot;description&quot;: &quot;A detailed description of the video&quot;,
+    &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+    
+    // Videos can have a georeference as well
+    &quot;georeference&quot;: {...},
+    
+    // One of the following
+    &quot;data&quot;: {...}
+}</code></pre>
+<p>“name” is a short title for the video. More information can be provided in the “description” field. “created” contains the ISO 8601 date corresponding to when the video was created.</p>
+<p>“data” refers to the filename of the video inside the archive. However, since video files can be quite large, it may be useful to simply encode a reference to the video as a URI. The reader of the file is then responsible for retrieving the actual video data. See the section about file references above.</p>
+</section>
+<section id="point" class="level4">
+<h4><a href="#point"><span class="header-section-number">1.3.3.9</span> point</a></h4>
+<p>The point field describes a single point-of-interest contained in an archive.</p>
+<pre><code>{
+    &quot;name&quot;: &quot;The point name&quot;,
+    &quot;description&quot;: &quot;A detailed description of the point&quot;,
+    &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+    &quot;object-type&quot;: &quot;...&quot;,
+    &quot;geometry&quot;: {...}
+}</code></pre>
+<p>“name” is a short title for the point-of-interest. More information can be provided in the “description” field. “created” contains the ISO 8601 date corresponding to when the point-of-interest was created.</p>
+<p>“object-type” describes the type of point and must be in the set of points that Aptomar systems can parse. The following table lists the supported types and meanings.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">type</th>
+<th style="text-align: center;">icon</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">boat</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Boat.png" alt="Boat" /></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">bouy</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Bouy.png" alt="Bouy" /></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">debris</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Debris.png" alt="Debris" /></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">fishfarm</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Fish%20farm.png" alt="Fish%20farm" /></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">green</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Green.png" alt="Green" /></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">oil</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Oil.png" alt="Oil" /></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">personnel</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Personnel.png" alt="Personnel" /></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">red</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Red.png" alt="Red" /></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">unknown</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Unknown.png" alt="Unknown" /></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vessel</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Vessel.png" alt="Vessel" /></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">yellow</td>
+<td style="text-align: center;"><img src="https://www.aptomar.com/pub/dev/sldicons/Yellow.png" alt="Yellow" /></td>
+</tr>
+</tbody>
+</table>
+<p>“geometry” is an object with the following format:</p>
+<pre><code>    {
+        &quot;type&quot;: &quot;text/x-ewkt&quot;,
+        &quot;data&quot;: [&quot;...&quot;]
+    }</code></pre>
+<p>In this object, “data” is either an array of text strings containing the geometry or a reference to a file containing the geometry. Interpretation is controlled by the “type” field. The only supported geometry type at present is “text/x-ewkt”. “ewkt” is the “Extended Well-Known Text” representation of the location of the point-of-interested. This must use the “POINT” WKT type.</p>
+</section>
+<section id="route" class="level4">
+<h4><a href="#route"><span class="header-section-number">1.3.3.10</span> route</a></h4>
+<p>The route field describes a single route contained in an archive.</p>
+<pre><code>{
+    &quot;name&quot;: &quot;The route name&quot;,
+    &quot;description&quot;: &quot;A detailed description of the route&quot;,
+    &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+    &quot;geometry&quot;: {...}
+}</code></pre>
+<p>“name” is a short title for the point-of-interest. More information can be provided in the “description” field. “created” contains the ISO 8601 date corresponding to when the point-of-interest was created.</p>
+<p>“geometry” is an object with the following format:</p>
+<pre><code>    {
+        &quot;type&quot;: &quot;text/x-ewkt&quot;,
+        &quot;data&quot;: [&quot;...&quot;]
+    }</code></pre>
+<p>In this object, “data” is either an array of text strings containing the geometry or a reference to a file containing the geometry. Interpretation is controlled by the “type” field. The only supported geometry type at present is “text/x-ewkt”. “ewkt” is the “Extended Well-Known Text” representation of the location of the point-of-interested. This must use the “LINESTRING” WKT type.</p>
+</section>
+<section id="area" class="level4">
+<h4><a href="#area"><span class="header-section-number">1.3.3.11</span> area</a></h4>
+<p>The area field describes a single area contained in an archive.</p>
+<pre><code>{
+    &quot;name&quot;: &quot;The area name&quot;,
+    &quot;description&quot;: &quot;A detailed description of the route&quot;,
+    &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+    &quot;geometry&quot;: {...}
+}</code></pre>
+<p>“name” is a short title for the point-of-interest. More information can be provided in the “description” field. “created” contains the ISO 8601 date corresponding to when the point-of-interest was created.</p>
+<p>“geometry” is an object with the following format:</p>
+<pre><code>    {
+        &quot;type&quot;: &quot;text/x-ewkt&quot;,
+        &quot;data&quot;: [&quot;...&quot;]
+    }</code></pre>
+<p>In this object, “data” is either an array of text strings containing the geometry or a reference to a file containing the geometry. Interpretation is controlled by the “type” field. The only supported geometry type at present is “text/x-ewkt”. “ewkt” is the “Extended Well-Known Text” representation of the location of the point-of-interested. This must use the “POLYGON” WKT type.</p>
+</section>
+</section>
+</section>
+<section id="examples" class="level2">
+<h2><a href="#examples"><span class="header-section-number">1.4</span> Examples</a></h2>
+<section id="map-data-layers" class="level3">
+<h3><a href="#map-data-layers"><span class="header-section-number">1.4.1</span> Map Data Layers</a></h3>
+<p>This section shows an example of how to encapsulate both geometry and styling information for any number of map data layers in a single file. The file also contains a description of the enclosed layers and describes how they are intended to be organized and displayed.</p>
+<p>The file is a zip-formatted archive with <em>.apt</em> extension containing the following:</p>
+<ul>
+<li>layer data in ESRI <a href="http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf">shapefile format</a></li>
+<li>styling information for each layer in <a href="http://www.opengeospatial.org/standards/sld">Styled Layer Descriptor format</a></li>
+<li>all additional resources needed by the layer or styling data</li>
+</ul>
+<p>A hypothetical archive could look as follows:</p>
+<pre><code>geom.apt
+|-- layers
+|   |-- layer1.dbf
+|   |-- layer1.shp
+|   `-- layer1.shx
+|-- manifest.json
+|-- resources
+`-- styles
+    `-- layer1.sld</code></pre>
+<p>And the corresponding manifest file could look like the following:</p>
+<pre><code>{
+    &quot;date&quot;: &quot;2012-12-19T08:46Z&quot;,
+    &quot;description&quot;: &quot;Text description of the contents for ↩
+    presentation in a confirmation dialog.&quot;,
+    &quot;generator&quot;: { 
+        &quot;program&quot;: &quot;SuperCool.app&quot;,
+        &quot;creator&quot;: &quot;Aptomar AS&quot;
+    },
+    &quot;manifest_version&quot;: 1,
+    &quot;asset&quot;: {
+        &quot;layers&quot;: { 
+            &quot;layer-1&quot;: {
+                &quot;name&quot;: &quot;Layer 1 Name&quot;,
+                &quot;geometry&quot;: {
+                    &quot;type&quot;: &quot;shapefile&quot;,
+                    &quot;data&quot;: [&quot;file:/layers/layer1.shp&quot;, ↩
+                    &quot;file:/layers/layer1.dbf&quot;,          ↩
+                    &quot;file:/layers/layer1.shx&quot;]           
+                 },
+                &quot;style&quot;: {
+                    &quot;data&quot;: [&quot;file:/styles/layer1.xml&quot;],
+                    &quot;type&quot;: &quot;sld&quot;
+                },
+                &quot;resources&quot;: {
+                    &quot;data&quot;: [&quot;file:/resource1.png&quot;,     ↩
+                    &quot;file:/resource2.png&quot;],
+                    &quot;type&quot;: &quot;image/png&quot;
+            }
+         },
+        &quot;groups&quot;: { 
+            &quot;group-1&quot;: {
+                &quot;name&quot;: &quot;Group 1 Name&quot;,
+                &quot;layers&quot;: [&quot;layer-1&quot;]
+            }
+        }
+    }
+}</code></pre>
+</section>
+<section id="image-1" class="level3">
+<h3><a href="#image-1"><span class="header-section-number">1.4.2</span> Image</a></h3>
+<p>A hypothetical archive could look as follows:</p>
+<pre><code>geotagged-image.apt
+|-- manifest.json
+`-- image.jpg</code></pre>
+<p>And the corresponding manifest file could look like the following:</p>
+<pre><code>{
+    &quot;date&quot;: &quot;2012-12-19T08:46Z&quot;,
+    &quot;description&quot;: &quot;Text description of the contents for ↩
+    presentation in a confirmation dialog.&quot;,
+    &quot;generator&quot;: { 
+        &quot;program&quot;: &quot;SuperCool.app&quot;,
+        &quot;creator&quot;: &quot;Aptomar AS&quot;
+    },
+    &quot;manifest_version&quot;: 1,
+    &quot;image&quot;: { 
+        &quot;name&quot;: &quot;The image name&quot;,
+        &quot;description&quot;: &quot;A detailed description of the image&quot;,
+        &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+        &quot;data&quot;: [&quot;file:image.jpg&quot;],
+        &quot;georeference&quot;: {
+            &quot;longitude&quot;: 10.4344,
+            &quot;latitude&quot;: 63.4181,
+            &quot;elevation&quot;: 150.60
+        },
+        &quot;bounds&quot;: {
+            &quot;type&quot;: &quot;text/x-worldfile&quot;,
+            &quot;data&quot;: [&quot;data:,bounds as a string, interpreted by type&quot;]
+        }
+    }
+}</code></pre>
+</section>
+<section id="video-1" class="level3">
+<h3><a href="#video-1"><span class="header-section-number">1.4.3</span> Video</a></h3>
+<p>A hypothetical archive could look as follows:</p>
+<pre><code>video.apt
+|-- manifest.json
+`-- clip.mp4</code></pre>
+<p>And the corresponding manifest file could look like the following:</p>
+<pre><code>{
+    &quot;date&quot;: &quot;2012-12-19T08:46Z&quot;,
+    &quot;description&quot;: &quot;Text description of the contents for ↩
+    presentation in a confirmation dialog.&quot;,
+    &quot;generator&quot;: { 
+        &quot;program&quot;: &quot;SuperCool.app&quot;,
+        &quot;creator&quot;: &quot;Aptomar AS&quot;
+    },
+    &quot;manifest_version&quot;: 1,
+    &quot;video&quot;: {
+        &quot;name&quot;: &quot;The video name&quot;,
+        &quot;description&quot;: &quot;A detailed description of the video&quot;,
+        &quot;created&quot;: &quot;2012–12–19T08:46Z&quot;,
+        &quot;georeference&quot;: {
+            &quot;longitude&quot;: 10.4344,
+            &quot;latitude&quot;: 63.4181,
+            &quot;elevation&quot;: 150.60
+        },
+        &quot;data&quot;: [&quot;clip.mp4&quot;]
+    }
+}</code></pre>
+</section>
+</section>
+<section id="useful-information" class="level2">
+<h2><a href="#useful-information"><span class="header-section-number">1.5</span> Useful Information</a></h2>
+<p>The <a href="http://en.wikipedia.org/wiki/Well-known_text" title="[E]WKT on Wikipedia">Well-Known Text</a> format is a simple way to textually describe points, lines, and polygons.</p>
+<p>These manifest files are written using <a href="http://www.json.org" title="The Javascript Object Notation">Javascript Object Notation</a>, a simple and commonly used method for data interchange.</p>
+<p>The <a href="http://en.wikipedia.org/wiki/World_file" title="The ESRI World file">ESRI World file</a> is a plain text file that is commonly used to georeference images.</p>
+</section>
+<section id="open-questions" class="level2">
+<h2><a href="#open-questions"><span class="header-section-number">1.6</span> Open Questions</a></h2>
+<ol type="1">
+<li>Should we have a “uuid” field for the data elements to allow for updating?</li>
+<li>Should we support WKB in addition to WKT?</li>
+<li>What about other formats like KML?</li>
+<li>Should we support a Zip format for the archive? What extension?</li>
+</ol>
+</section>
+</section>
+<section id="appendix-manifest.json-schema" class="level1">
+<h1><a href="#appendix-manifest.json-schema"><span class="header-section-number">2</span> Appendix: <em>manifest.json</em> Schema</a></h1>
+<p>This appendix contains a copy of the schema. The electronic version may be obtained from <a href="https://raw.github.com/aptomar/apt-file-format/master/src/apt.schema.json">https://raw.github.com/aptomar/apt-file-format/master/src/apt.schema.json</a>.</p>
+<pre><code>{
+  &quot;type&quot;:&quot;object&quot;,
+  &quot;$schema&quot;: &quot;http://json-schema.org/draft-04/schema&quot;,
+  &quot;id&quot;: &quot;https://raw.github.com/aptomar/apt-file-format/master/src/apt.schema.json&quot;,
+  &quot;minProperties&quot;: 4,
+  &quot;maxProperties&quot;: 5,
+  &quot;definitions&quot;: {
+    &quot;dataset&quot;: {
+      &quot;type&quot;:&quot;array&quot;,
+      &quot;title&quot;: &quot;A set of files&quot;,
+      &quot;description&quot;: &quot;Files in the archive that contain the data of interest&quot;,
+      &quot;minitems&quot;: &quot;1&quot;,
+      &quot;items&quot;:{
+        &quot;type&quot;:&quot;string&quot;,
+        &quot;title&quot;:&quot;Data-URI encoded reference.&quot;,
+        &quot;description&quot;: &quot;Use &#39;data:&lt;mime-type&gt;[;base64],&lt;...&gt;&#39; for data URIs, &#39;file:&lt;...&gt;&#39; for file references, and &#39;http://&lt;host&gt;/&lt;file&gt;&#39; for external references.&quot;
+      }
+    },
+    &quot;date&quot;: {
+      &quot;type&quot;:&quot;string&quot;,
+      &quot;title&quot;: &quot;Datestamp&quot;,
+      &quot;description&quot;: &quot;ISO 8601 date.&quot;,
+      &quot;format&quot;: &quot;date-time&quot;
+    },
+    &quot;description&quot;: {
+      &quot;type&quot;:&quot;string&quot;,
+      &quot;title&quot;: &quot;Description&quot;,
+      &quot;description&quot;: &quot;The detailed description of the data element&quot;
+    },
+    &quot;name&quot;: {
+      &quot;type&quot;:&quot;string&quot;,
+      &quot;title&quot;: &quot;Content name&quot;,
+      &quot;description&quot;: &quot;The display name of the data element&quot;
+    },
+    &quot;georeference&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;title&quot;: &quot;Georeference&quot;,
+      &quot;description&quot;: &quot;A georeference object that locates the element in space.&quot;,
+      &quot;properties&quot;:{
+        &quot;elevation&quot;: {
+          &quot;type&quot;:&quot;number&quot;,
+          &quot;title&quot;: &quot;Georeference elevation&quot;,
+          &quot;description&quot;: &quot;The elevation of the object.&quot;
+        },
+        &quot;latitude&quot;: {
+          &quot;type&quot;:&quot;number&quot;,
+          &quot;title&quot;: &quot;Georeference latitude&quot;,
+          &quot;description&quot;: &quot;The latitude of the object.&quot;
+        },
+        &quot;longitude&quot;: {
+          &quot;type&quot;:&quot;number&quot;,
+          &quot;title&quot;: &quot;Georeference longitude&quot;,
+          &quot;description&quot;: &quot;The longitude of the object.&quot;
+        }
+      },
+      &quot;required&quot;: [&quot;elevation&quot;,&quot;latitude&quot;,&quot;longitude&quot;]
+    },
+    &quot;geometry&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;title&quot;: &quot;Data geometry&quot;,
+      &quot;description&quot;: &quot;The geometry of the data element&quot;,
+      &quot;properties&quot;:{
+        &quot;data&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/dataset&quot;     
+        },
+        &quot;type&quot;: {
+          &quot;type&quot;:&quot;string&quot;,
+          &quot;title&quot;: &quot;Geometry type&quot;,
+          &quot;description&quot;: &quot;The pseudo-mime type of the geometry.  E.g. &#39;text/x-ewkt&#39;.  The type controls the interpretation of the &#39;data&#39; elements.&quot;,
+          &quot;enum&quot;: [&quot;text/x-ewkt&quot;]
+        }
+      },
+      &quot;required&quot;: [&quot;data&quot;,&quot;type&quot;]
+    }
+  },
+  &quot;required&quot;: [&quot;date&quot;,&quot;description&quot;,&quot;manifest_version&quot;,&quot;generator&quot;],
+  &quot;additionalProperties&quot;: false,
+  &quot;properties&quot;:{
+    &quot;area&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;:{
+        &quot;created&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/date&quot;
+        },
+        &quot;description&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/description&quot;
+        },
+        &quot;name&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/name&quot;
+        },
+        &quot;geometry&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/geometry&quot;
+        }
+      },
+      &quot;required&quot;: [&quot;created&quot;,&quot;description&quot;,&quot;name&quot;,&quot;geometry&quot;]
+    },
+    &quot;asset&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;additionalProperties&quot;: false,
+      &quot;required&quot;: [&quot;groups&quot;, &quot;layers&quot;],
+      &quot;properties&quot;:{
+        &quot;groups&quot;: {
+          &quot;type&quot;:&quot;object&quot;,
+          &quot;minProperties&quot;: 1,
+          &quot;additionalProperties&quot;: false,
+          &quot;patternProperties&quot;:{
+            &quot;group&quot;: {
+              &quot;type&quot;:&quot;object&quot;,
+              &quot;additionalProperties&quot;: false,
+              &quot;properties&quot;:{
+                &quot;layers&quot;: {
+                  &quot;type&quot;:&quot;array&quot;,
+                  &quot;title&quot;: &quot;Group layers&quot;,
+                  &quot;description&quot;: &quot;This is an array of layers that are included in the group.&quot;,
+                  &quot;minitems&quot;: &quot;1&quot;,
+                  &quot;items&quot;:{
+                    &quot;type&quot;:&quot;string&quot;
+                  }
+                },
+                &quot;name&quot;: {
+                  &quot;type&quot;:&quot;string&quot;,
+                  &quot;title&quot;: &quot;Group name&quot;,
+                  &quot;description&quot;: &quot;The name of the group.  Required for display purposes.&quot;
+                }
+              },
+              &quot;required&quot;: [&quot;layers&quot;, &quot;name&quot;]
+            }
+          }
+        },
+        &quot;layers&quot;: {
+          &quot;type&quot;:&quot;object&quot;,
+          &quot;title&quot;: &quot;Data layers&quot;,
+          &quot;description&quot;: &quot;The data layers included in the .apt archive.&quot;,
+          &quot;minProperties&quot;: 1,
+          &quot;additionalProperties&quot;: false,
+          &quot;patternProperties&quot;:{
+            &quot;layer&quot;: {
+              &quot;type&quot;:&quot;object&quot;,
+              &quot;required&quot;: [&quot;geometry&quot;,&quot;name&quot;,&quot;style&quot;],
+              &quot;additionalProperties&quot;: false,
+              &quot;properties&quot;:{
+                &quot;geometry&quot;: {
+                  &quot;type&quot;:&quot;object&quot;,
+                  &quot;additionalProperties&quot;: false,
+                  &quot;properties&quot;:{
+                    &quot;data&quot;: {
+                      &quot;$ref&quot;: &quot;#/definitions/dataset&quot;
+                    },
+                    &quot;type&quot;: {
+                      &quot;type&quot;:&quot;string&quot;,
+                      &quot;enum&quot;: [&quot;text/x-shapefile&quot;]
+                    }
+                  },
+                  &quot;required&quot;: [&quot;data&quot;, &quot;type&quot;]
+                },
+                &quot;name&quot;: {
+                  &quot;type&quot;:&quot;string&quot;,
+                  &quot;title&quot;: &quot;Layer name&quot;,
+                  &quot;description&quot;: &quot;The name of the layer.  Required for display purposes.&quot;
+                },
+                &quot;resources&quot;: {
+                  &quot;type&quot;:&quot;object&quot;,
+                  &quot;title&quot;: &quot;Layer resources&quot;,
+                  &quot;description&quot;: &quot;The resources needed for styling the layer&quot;,
+                  &quot;additionalProperties&quot;: false,
+                  &quot;properties&quot;:{
+                    &quot;data&quot;: {
+                      &quot;$ref&quot;: &quot;#/definitions/dataset&quot;
+                    }
+                  },
+                  &quot;required&quot;: [&quot;data&quot;]
+                },
+                &quot;style&quot;: {
+                  &quot;type&quot;:&quot;object&quot;,
+                  &quot;title&quot;: &quot;Layer style&quot;,
+                  &quot;description&quot;: &quot;The style description for the layer&quot;,
+                  &quot;additionalProperties&quot;: false,
+                  &quot;properties&quot;:{
+                    &quot;data&quot;: {
+                      &quot;$ref&quot;: &quot;#/definitions/dataset&quot;
+                    },
+                    &quot;type&quot;: {
+                      &quot;type&quot;:&quot;string&quot;,
+                      &quot;title&quot;: &quot;Style type&quot;,
+                      &quot;description&quot;: &quot;The pseudo-mime type of the styling information.  E.g. &#39;text/x-sld&#39;&quot;,
+                      &quot;enum&quot;: [&quot;text/x-sld&quot;]
+                    }
+                  },
+                  &quot;required&quot;: [&quot;data&quot;, &quot;type&quot;]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    &quot;date&quot;: {
+      &quot;$ref&quot;: &quot;#/definitions/date&quot;
+    },
+    &quot;description&quot;: {
+      &quot;$ref&quot;: &quot;#/definitions/description&quot;
+    },
+    &quot;generator&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;title&quot;: &quot;Archive generator&quot;,
+      &quot;description&quot;: &quot;Contains information about the generating program / organization.&quot;,
+      &quot;required&quot;: [&quot;creator&quot;,&quot;program&quot;],
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;:{
+        &quot;creator&quot;: {
+          &quot;type&quot;:&quot;string&quot;
+        },
+        &quot;program&quot;: {
+          &quot;type&quot;:&quot;string&quot;
+        }
+      }
+    },
+    &quot;image&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;required&quot;: [&quot;created&quot;,&quot;description&quot;,&quot;name&quot;,&quot;data&quot;],
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;:{
+        &quot;bounds&quot;: {
+          &quot;type&quot;:&quot;object&quot;,
+          &quot;title&quot;: &quot;Image bounds&quot;,
+          &quot;description&quot;: &quot;The bounds for the image data in the archive&quot;,
+          &quot;required&quot;:[&quot;data&quot;,&quot;type&quot;],
+          &quot;additionalProperties&quot;: false,
+          &quot;properties&quot;:{
+            &quot;data&quot;: {
+              &quot;$ref&quot;: &quot;#/definitions/dataset&quot;
+            },
+            &quot;type&quot;: {
+              &quot;type&quot;:&quot;string&quot;,
+              &quot;title&quot;: &quot;Bounds type&quot;,
+              &quot;description&quot;: &quot;The type of the bounds data.  E.g. &#39;text/x-worldfile&#39;.&quot;,
+              &quot;enum&quot;: [&quot;text/x-worldfile&quot;]
+            }
+          }
+        },
+        &quot;created&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/date&quot;
+        },
+        &quot;description&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/description&quot;
+        },
+        &quot;name&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/name&quot;
+        },
+        &quot;data&quot;: { 
+          &quot;$ref&quot;: &quot;#/definitions/dataset&quot;         
+        },
+        &quot;georeference&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/georeference&quot;
+        }
+      }
+    },
+    &quot;manifest_version&quot;: {
+      &quot;type&quot;:&quot;number&quot;,
+      &quot;title&quot;: &quot;Manifest version&quot;,
+      &quot;description&quot;: &quot;The version of the manifest schema used to validate the manifest contents.&quot;
+    },
+    &quot;point&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;title&quot;: &quot;Point-of-Interest&quot;,
+      &quot;description&quot;: &quot;A representation of a point-of-interest&quot;,
+      &quot;required&quot;:[&quot;created&quot;,&quot;description&quot;,&quot;name&quot;,&quot;geometry&quot;,&quot;object-type&quot;],
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;:{
+        &quot;created&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/date&quot;
+        },
+        &quot;description&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/description&quot;
+        },
+        &quot;name&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/name&quot;
+        },
+        &quot;geometry&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/geometry&quot;
+        },
+        &quot;object-type&quot;: {
+          &quot;type&quot;:&quot;string&quot;,
+          &quot;title&quot;: &quot;Object type&quot;,
+          &quot;description&quot;: &quot;The type of the point-of-interest&quot;,
+          &quot;enum&quot;: [&quot;boat&quot;, &quot;bouy&quot;, &quot;debris&quot;, &quot;fishfarm&quot;, &quot;green&quot;, &quot;oil&quot;, &quot;personnel&quot;, &quot;red&quot;, &quot;unknown&quot;, &quot;vessel&quot;, &quot;yellow&quot;]
+        }
+      }
+    },
+    &quot;route&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;title&quot;: &quot;Route&quot;,
+      &quot;description&quot;: &quot;A represtentation of a route generated by or for display in Scope.&quot;,
+      &quot;required&quot;:[&quot;created&quot;,&quot;description&quot;,&quot;name&quot;,&quot;geometry&quot;],
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;:{
+        &quot;created&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/date&quot;
+        },
+        &quot;description&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/description&quot;
+        },
+        &quot;name&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/name&quot;
+        },
+        &quot;geometry&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/geometry&quot;
+        }
+      }
+    },
+    &quot;video&quot;: {
+      &quot;type&quot;:&quot;object&quot;,
+      &quot;required&quot;:[&quot;created&quot;,&quot;description&quot;,&quot;name&quot;,&quot;data&quot;],
+      &quot;additionalProperties&quot;: false,
+      &quot;properties&quot;:{
+        &quot;created&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/date&quot;
+        },
+        &quot;description&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/description&quot;
+        },
+        &quot;name&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/name&quot;
+        },
+        &quot;data&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/dataset&quot;
+        },
+        &quot;georeference&quot;: {
+          &quot;$ref&quot;: &quot;#/definitions/georeference&quot;
+        }
+      }
+    }
+  }
+}</code></pre>
+</section>
+<table id="footerTable">
+<tr><td>Document: :</td><td>Revision: 1</td><td></td></tr>
+</table>
+</body>
+</html>
