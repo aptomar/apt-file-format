@@ -2,11 +2,11 @@ Source: aptofile
 Section: utils
 Priority: extra
 Maintainer: Jarle Bauck Hamar <jarle.hamar@aptomar.com>
-Build-Depends: debhelper (>= 8.0.0)
-Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.8.1
 Homepage: http://www.aptomar.com/
 
 Package: aptofile
 Architecture: all
-Depends: ${misc:Depends}
+Depends: python, ${misc:Depends}
 Description: Python utility for creating and verifying Apomar Files (.apt)

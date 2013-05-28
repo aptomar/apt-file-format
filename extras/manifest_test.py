@@ -227,10 +227,6 @@ class TestImage(unittest.TestCase):
 		del self.inst["image"]["georeference"]["longitude"]
 		expect_validate_failure(self, self.inst, self.schema)
 
-	def test_image_missing_elev(self):
-		del self.inst["image"]["georeference"]["elevation"]
-		expect_validate_failure(self, self.inst, self.schema)
-
 	def test_image_no_georeference(self):
 		del self.inst["image"]["georeference"]
 		validate_or_fail(self, self.inst, self.schema)
@@ -250,6 +246,96 @@ class TestImage(unittest.TestCase):
 	def test_image_bounds_file(self):
 		self.inst["image"]["bounds"]["data"] = ["file1", "file2"]
 		validate_or_fail(self, self.inst, self.schema)
+
+class TestRadar(unittest.TestCase):
+
+	def setUp(self):
+		self.schema = load_json_from_file(SCHEMA_FILE)
+		self.inst = load_json_from_file("tests/valid/radar.json")
+
+	def test_valid_image(self):
+		validate_or_fail(self, self.inst, self.schema)
+
+	def test_radar_bad_created_date(self):
+		self.inst["image"]["created"] = "tomorrow"
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_no_file(self):
+		del self.inst["image"]["data"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_no_created_date(self):
+		del self.inst["image"]["created"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_no_desc(self):
+		del self.inst["image"]["description"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_no_name(self):
+		del self.inst["image"]["name"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_disallow_additional_properties(self):
+		self.inst["image"]["extra"] = "large"
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_no_bounds(self):
+		del self.inst["image"]["bounds"]
+		validate_or_fail(self, self.inst, self.schema)
+
+	def test_radar_bounds_missing_pwidth(self):
+		del self.inst["image"]["bounds"]["pixel_width"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_bounds_missing_pheight(self):
+		del self.inst["image"]["bounds"]["pixel_height"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_bounds_missing_punits(self):
+		del self.inst["image"]["bounds"]["pixel_units"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_bounds_missing_rotx(self):
+		del self.inst["image"]["bounds"]["rotation_x"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_radar_bounds_missing_roty(self):
+		del self.inst["image"]["bounds"]["rotation_y"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_observation_missing_date(self):
+		del self.inst["observation"]["date"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_observation_missing_nwbounds(self):
+		del self.inst["observation"]["bounds_nw"]
+		expect_validate_failure(self, self.inst, self.schema)
+
+	def test_observation_missing_sebounds(self):
+		del self.inst["observation"]["bounds_se"]
+		expect_validate_failure(self, self.inst, self.schema)		
+
+	def test_sensor_missing_shortname(self):
+		del self.inst["sensor"]["shortname"]
+		expect_validate_failure(self, self.inst, self.schema)		
+
+	def test_sensor_missing_location_name(self):
+		del self.inst["sensor"]["location_name"]
+		expect_validate_failure(self, self.inst, self.schema)		
+
+	def test_sensor_missing_manufacturer_name(self):
+		del self.inst["sensor"]["manufacturer_name"]
+		expect_validate_failure(self, self.inst, self.schema)		
+
+	def test_sensor_missing_model_number(self):
+		del self.inst["sensor"]["model_number"]
+		expect_validate_failure(self, self.inst, self.schema)		
+
+	def test_sensor_missing_serial_number(self):
+		del self.inst["sensor"]["serial_number"]
+		expect_validate_failure(self, self.inst, self.schema)		
+
 
 
 class TestPoint(unittest.TestCase):
@@ -365,10 +451,6 @@ class TestVideo(unittest.TestCase):
 
 	def test_video_missing_lon(self):
 		del self.inst["video"]["georeference"]["longitude"]
-		expect_validate_failure(self, self.inst, self.schema)
-
-	def test_video_missing_elev(self):
-		del self.inst["video"]["georeference"]["elevation"]
 		expect_validate_failure(self, self.inst, self.schema)
 
 	def test_video_no_georeference(self):

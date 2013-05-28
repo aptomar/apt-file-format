@@ -13,3 +13,8 @@ install:
 	mkdir -p $(PROGDIR)
 	python setup.py install --root debian/tmp
 
+.PHONY: test
+test:
+	@cd test && python testAptofile.py
+
+check: test

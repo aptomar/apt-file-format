@@ -1,5 +1,5 @@
 Title: aptomar file format description
-Author: Matt Long, aptomar AS 
+Author: Matt Long, aptomar AS
 Date: 2013-02-25
 email: matthew.long@aptomar.com
 doctitle: aptomar file format description

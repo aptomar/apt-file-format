@@ -1,21 +1,68 @@
 ################################################################
 #                                                              #
-# test.py                                                      #
+# testAptofile.py                                              #
 # Copyright (c) 2013 Aptomar AS, All Rights Reserved           #
 #                                                              #
 # Author: Jarle Bauck Hamar: <jarle.hamar@aptomar.com>         #
-# Date: 2013-03-11                                             #
+# Date: 2013-05-23                                             #
 #                                                              #
 ################################################################
 
 
 import unittest
 import sys
+import json
 
 sys.path.append('../src')
 from aptofile import Aptofile
+import jsonschema
 
-class Test(unittest.TestCase):
+class TestManifest(unittest.TestCase):
+
+    def setUp(self):
+        with open('tests/header.json') as fid:
+            self.inst = json.load(fid)
+        self.schema = Aptofile.SCHEMA
+
+    def validate(self):
+        try:
+            jsonschema.validate(self.inst, self.schema, Aptofile.VALIDATOR,
+                                format_checker = jsonschema.FormatChecker())
+        except jsonschema.ValidationError:
+            return False
+        return True
+
+    def test_schema_validates(self):
+        Aptofile.VALIDATOR.check_schema(Aptofile.SCHEMA)
+
+    def test_valid_manifest_header(self):
+        self.assertTrue(self.validate())
+
+    def test_manifest_missing_date(self):
+        del self.inst["date"]
+        self.assertFalse(self.validate())
+
+    def test_manifest_missing_description(self):
+        del self.inst["description"]
+        self.assertFalse(self.validate())
+
+    def test_manifest_missing_version(self):
+        del self.inst["manifest_version"]
+        self.assertFalse(self.validate())
+
+    def test_manifest_missing_generator(self):
+        del self.inst["generator"]
+        self.assertFalse(self.validate())
+
+    def test_manifest_bad_date(self):
+        self.inst["date"] = "tomorrow"
+        self.assertFalse(self.validate())
+
+    def test_manifest_disallow_additional_properties(self):
+        self.inst["extra"] = "large"
+        self.assertFalse(self.validate())
+
+class TestAsset(unittest.TestCase):
 
     def testCreateAsset(self):
         f = 'tests/asset.apt'
@@ -24,7 +71,7 @@ class Test(unittest.TestCase):
             af.setGenerator("aptfile.py", "Aptomar AS")
             af.addLayer('layer1', name='layer1-name',
                         geometry_data=[('tests/asset/layers/layer1.dbf',
-                                        'layers/layer1.dbf'),
+                                        'file:/layers/layer1.dbf'),
                                        ('tests/asset/layers/layer1.shp',
                                         'layers/layer1.shp'),
                                        ('tests/asset/layers/layer1.shx',
@@ -140,7 +187,7 @@ class Test(unittest.TestCase):
 
         #Validate after write and open
         self.assertFalse(Aptofile.validateFile(f))
-        
+
     def testAssetMissingStyle(self):
         f = 'tests/asset_missing_style.apt'
         with Aptofile.create(f,'asset') as af:
@@ -225,7 +272,9 @@ class Test(unittest.TestCase):
 
         #Validate after write and open
         self.assertFalse(Aptofile.validateFile(f))
-        
+
+class TestImage(unittest.TestCase):
+
     def testImage(self):
         f = 'tests/image.apt'
         with Aptofile.create(f,'image') as af:
@@ -238,7 +287,7 @@ class Test(unittest.TestCase):
             af.addImageFile(('tests/image/image.jpg','image.jpg'))
 
             self.assertTrue(af.validate())
-            
+
         self.assertTrue(Aptofile.validateFile(f))
 
     def testImageMissingDate(self):
@@ -255,7 +304,23 @@ class Test(unittest.TestCase):
             self.assertTrue(af.validate())
             del af.manifest['image']['created']
         self.assertFalse(Aptofile.validateFile(f))
-        
+
+    def testImageIncorrectDate(self):
+        f = 'tests/image_missing_date.apt'
+        with Aptofile.create(f,'image') as af:
+            af.setGenerator(program='aptfile.py',creator='Aptomar AS')
+            af.setDescription('This is a description of the image')
+            af.setImageName('The image name')
+            af.setImageDescription('An image of something')
+            af.setImageGeoreference( 10.4344, 63.4181, 150.60)
+            af.setImageBounds(['data:,bounds as a string'])
+            af.addImageFile(('tests/image/image.jpg','image.jpg'))
+
+            self.assertTrue(af.validate())
+            af.manifest['image']['created'] = '23.05.13'
+            af.validate()
+        self.assertFalse(Aptofile.validateFile(f))
+
     def testImageMissingFileAndGenerator(self):
         f = 'tests/image_missing_file_and_generator.apt'
         with Aptofile.create(f,'image') as af:
@@ -270,7 +335,7 @@ class Test(unittest.TestCase):
             self.assertFalse(af.validate())
         self.assertFalse(Aptofile.validateFile(f))
 
-        
+
     def testImageMissingGenerator(self):
         f = 'tests/image_missing_generator.apt'
         with Aptofile.create(f,'image') as af:
@@ -285,7 +350,9 @@ class Test(unittest.TestCase):
             self.assertTrue(af.validate())
             del af.manifest['generator']
         self.assertFalse(Aptofile.validateFile(f))
-        
+
+class testVideo(unittest.TestCase):
+
     def testVideo(self):
         f = 'tests/video.apt'
         with Aptofile.create(f,'video') as af:
@@ -323,7 +390,7 @@ class Test(unittest.TestCase):
             af.manifest['video']['data']=['video.avi']
             self.assertFalse(af.validate())
         self.assertFalse(Aptofile.validateFile(f))
-        
+
     def testVideoMissingName(self):
         f = 'tests/video_missing_name.apt'
         with Aptofile.create(f,'video') as af:
@@ -337,7 +404,9 @@ class Test(unittest.TestCase):
             self.assertTrue(af.validate())
             del af.manifest['video']['name']
         self.assertFalse(Aptofile.validateFile(f))
-        
+
+class TestPoint(unittest.TestCase):
+
     def testPoint(self):
         f = 'tests/point.apt'
         with Aptofile.create(f,'point') as af:
@@ -365,7 +434,7 @@ class Test(unittest.TestCase):
             af.manifest['point']['object-type'] = 'UFO'
         self.assertFalse(Aptofile.validateFile(f))
 
-            
+
     def testRoute(self):
         f = 'tests/route.apt'
         with Aptofile.create(f,'route') as af:
@@ -388,8 +457,10 @@ class Test(unittest.TestCase):
             af.setRouteGeometry('data:data_describing_the_route')
             self.assertTrue(af.validate())
             del af.manifest['route']['geometry']
-            
+
         self.assertFalse(Aptofile.validateFile(f))
+
+class TestArea(unittest.TestCase):
 
     def testArea(self):
         f = 'tests/area.apt'

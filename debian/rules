@@ -9,5 +9,8 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+# FIXME: remove the override if unittest works
+override_dh_auto_test:
+
 %:
 	dh $@ 

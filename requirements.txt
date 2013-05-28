@@ -1,0 +1,2 @@
+isodate==0.4.9
+gsconfig==0.6.2

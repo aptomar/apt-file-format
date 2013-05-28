@@ -1,0 +1,44 @@
+{
+  "date": "2013-05-27T08:46:00Z",
+  "description": "Something useful",
+  "generator": {
+    "program": "Generator.exe",
+    "creator": "Company A/S"
+  },
+  "manifest_version": 1,
+  "image": {
+    "name": "The image name",
+    "description": "A detailed description of the image",
+    "created": "2013-05-27T08:46:00Z",
+    "data": [ "file:radar.png" ],
+    "bounds": {
+      "pixel_width": 0.000415,
+      "pixel_height": -0.000141,
+      "pixel_units": "degrees",
+      "rotation_x": 0,
+      "rotation_y": 0,
+      "upperleft": {
+        "latitude": 70.014783,
+        "longitude": 15.127447
+      }
+    }
+  },
+  "observation": {
+    "date": "2013-05-27T08:46:00Z",
+    "bounds_nw": {
+      "longitude": 15.139300,
+      "latitude": 70.011900
+    },
+    "bounds_se": {
+      "longitude": 15.334700,
+      "latitude": 69.919100
+    }
+  },
+  "sensor": {
+    "shortname": "SLAR",
+    "location_name": "My Vessel",
+    "manufacturer_name": "Company A/S",
+    "model_number": "Generator 1.2",
+    "serial_number": "1234567"
+  }
+} 

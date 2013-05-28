@@ -593,7 +593,7 @@ class Draft4Validator(ValidatorMixin, _Draft34CommonMixin, object):
         if not self.is_type(instance, "object"):
             return
         if self.is_type(instance, "object") and len(instance) > mP:
-            yield ValidationError("%r is too short" % (instance,))
+            yield ValidationError("%r is too long" % (instance,))
 
     def validate_allOf(self, allOf, instance, schema):
         for subschema in allOf:
@@ -1172,7 +1172,7 @@ def _meta_schemas():
     """
 
     meta_schemas = (v.META_SCHEMA for v in validators.values())
-    return dict((urlparse.urldefrag(m["id"])[0], m) for m in meta_schemas)
+    return dict(((urlparse.urldefrag(m["id"])[0]).encode('ascii'), m) for m in meta_schemas)
 
 
 def _find_additional_properties(instance, schema):
