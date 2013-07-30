@@ -44,7 +44,7 @@
             },
             "group-2": {
                 "name": "Group 2 Name",
-                "layers": ["layer-1"]
+                "layers": ["layer-1", "layer-2"]
             }
         }
     }
